@@ -163,14 +163,22 @@
 <script>
     let itensDaRevisao = [];
     let historico = JSON.parse(localStorage.getItem("elite_v13_data") || "[]");
+    let editandoId = null; // Variável para controlar o estado de edição
 
     function mudarAba(aba) {
         document.getElementById('aba-cadastro').style.display = 'none';
         document.getElementById('aba-admin').style.display = 'none';
         document.getElementById('aba-historico_aba').style.display = 'none';
         document.getElementById('aba-' + aba).style.display = 'block';
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        if(event) event.currentTarget.classList.add('active');
+        
+        // Ajusta classes dos botões das abas
+        document.querySelectorAll('.tab-btn').forEach(b => {
+            b.classList.remove('active');
+            if(b.innerText.toLowerCase().includes(aba === 'historico_aba' ? 'histórico' : aba === 'cadastro' ? 'serviços' : 'faturamento')) {
+                b.classList.add('active');
+            }
+        });
+
         if(aba === 'admin') atualizarPainelAdmin();
     }
 
@@ -239,15 +247,50 @@
         document.getElementById("adm-qtd").innerText = historico.length;
     }
 
+    // NOVA FUNÇÃO: CARREGAR DADOS PARA EDIÇÃO
+    function editarServico(id) {
+        const r = historico.find(h => h.id === id);
+        if (!r) return;
+
+        editandoId = id; 
+        
+        document.getElementById("cliente").value = r.cliente;
+        document.getElementById("telefone").value = r.telefone;
+        
+        // Tenta separar modelo e ano (ajuste conforme salvamento)
+        const partesMoto = r.moto.split(' ');
+        const ano = partesMoto.pop();
+        const modelo = partesMoto.join(' ');
+        
+        document.getElementById("moto").value = modelo;
+        document.getElementById("anoMoto").value = ano;
+        document.getElementById("placa").value = r.placa;
+        document.getElementById("km").value = r.km;
+        document.getElementById("prox_km").value = r.prox_km;
+        document.getElementById("data").value = r.data;
+        document.getElementById("obs").value = r.obs;
+
+        itensDaRevisao = JSON.parse(JSON.stringify(r.itens));
+        renderizarTabela();
+
+        mudarAba('cadastro');
+        const btnSave = document.getElementById("btnSalvar");
+        btnSave.innerText = "ATUALIZAR NO HISTÓRICO";
+        btnSave.style.background = "#00c851"; 
+        
+        window.scrollTo(0,0);
+    }
+
     document.getElementById("btnSalvar").onclick = () => {
         const cliente = document.getElementById("cliente").value;
         if(!cliente) return alert("Nome necessário!");
         salvarEstadoCampos();
+        
         let totalServico = 0;
         itensDaRevisao.forEach(i => totalServico += parseFloat(i.preco.replace(',', '.')) || 0);
 
-        historico.push({
-            id: Date.now(),
+        const dadosServico = {
+            id: editandoId || Date.now(),
             cliente,
             telefone: document.getElementById("telefone").value,
             moto: `${document.getElementById("moto").value} ${document.getElementById("anoMoto").value}`,
@@ -258,10 +301,18 @@
             obs: document.getElementById("obs").value,
             itens: JSON.parse(JSON.stringify(itensDaRevisao)),
             total: totalServico
-        });
+        };
+
+        if (editandoId) {
+            const index = historico.findIndex(h => h.id === editandoId);
+            historico[index] = dadosServico;
+            alert("Serviço atualizado!");
+        } else {
+            historico.push(dadosServico);
+            alert("Salvo com sucesso!");
+        }
 
         localStorage.setItem("elite_v13_data", JSON.stringify(historico));
-        alert("Salvo com sucesso!");
         location.reload();
     };
 
@@ -276,7 +327,10 @@
                     <span style="cursor: pointer; color: var(--primary); font-size: 16px; font-weight: bold; text-decoration: underline;" onclick="verDetalhes(${r.id})">${r.cliente.toUpperCase()}</span><br>
                     <small>${r.moto} | ${r.placa} | R$ ${r.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</small>
                 </div>
-                <button class="btn" style="border-color:var(--danger); color:var(--danger)" onclick="excluir(${r.id})">Excluir</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn" style="border-color:var(--primary); color:var(--primary); padding: 8px 12px;" onclick="editarServico(${r.id})">EDITAR</button>
+                    <button class="btn" style="border-color:var(--danger); color:var(--danger); padding: 8px 12px;" onclick="excluir(${r.id})">Excluir</button>
+                </div>
             </div>`).join('');
     }
 
