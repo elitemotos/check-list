@@ -1,475 +1,323 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELITE MOTO PEÇAS - Sistema Profissional</title>
+    
+    <meta property="og:title" content="Para Você, Meu Amor ❤️">
+    <meta property="og:description" content="A distância é apenas um detalhe para quem tem o destino traçado.">
+    <meta property="og:image" content="https://i.ibb.co/7JcxnCP7/Whats-App-Image-2026-02-16-at-19-53-06-2.jpg">
+    
+    <title>Para Você, Meu Amor</title>
+    
+    <script src="https://unpkg.com/scrollreveal"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    
     <style>
-        :root { --primary: #ffc107; --bg: #111; --card: #000; --text: #eee; --danger: #ff4444; --success: #00c851; --info: #0099cc; }
-        
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); padding: 15px; color: var(--text); margin: 0; }
-        
-        .container { 
-            background: var(--card); padding: 25px; max-width: 900px; margin: auto; 
-            border: 2px solid var(--primary); border-radius: 12px; 
-            box-shadow: 0 0 30px rgba(255, 193, 7, 0.15); position: relative; overflow: hidden; 
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Lora:ital,wght@0,400;1,400&display=swap');
+
+        :root { 
+            --cor-principal: #b33939; 
+            --cor-fundo: #fdf2f2; 
+            --cor-polaroid: #ffffff;
+            --cor-texto: #333;
+            --cor-carta: rgba(255, 255, 255, 0.8);
         }
 
-        .container::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background-image: url('https://i.postimg.cc/k4trSjwW/Gemini-Generated-Image-zi6ckhzi6ckhzi6c.png');
-            background-repeat: no-repeat; background-position: center; background-size: 60%; 
-            opacity: 0.1; z-index: 0; pointer-events: none; 
+        /* Estilos para Modo Noturno */
+        [data-theme="dark"] {
+            --cor-principal: #ff7675;
+            --cor-fundo: #1a0a0a;
+            --cor-polaroid: #2d1a1a;
+            --cor-texto: #fdf2f2;
+            --cor-carta: rgba(45, 26, 26, 0.85);
         }
 
-        .container > * { position: relative; z-index: 1; }
-        
-        .header { text-align: center; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 30px; }
-        .logo-img { max-width: 220px; height: auto; margin-bottom: 15px; display: block; margin-left: auto; margin-right: auto; border-radius: 10px; }
-        
-        .tabs { display: flex; gap: 5px; margin-bottom: 20px; }
-        .tab-btn { flex: 1; padding: 12px; background: #1a1a1a; color: var(--primary); border: 1px solid var(--primary); cursor: pointer; font-weight: bold; text-transform: uppercase; border-radius: 5px; }
-        .tab-btn.active { background: var(--primary); color: #000; }
+        * { box-sizing: border-box; transition: background-color 0.8s ease, color 0.8s ease; }
+        html { scroll-behavior: smooth; }
 
-        .info { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; }
-        
-        input, textarea, select { 
-            width: 100%; padding: 12px; border: 1px solid #333; border-radius: 8px; 
-            background: #1a1a1a; color: #fff; box-sizing: border-box; font-size: 14px; min-height: 45px; 
+        body {
+            background-color: var(--cor-fundo); 
+            color: var(--cor-texto);
+            font-family: 'Lora', serif; 
+            margin: 0; padding: 0;
+            overflow-x: hidden;
         }
 
-        .live-total-bar {
-            background: linear-gradient(90deg, #1a1a1a, #222);
-            border: 1px solid var(--primary);
-            padding: 15px; border-radius: 8px; margin: 15px 0;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .live-total-bar span { font-weight: bold; color: var(--primary); font-size: 1.4em; }
-
-        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .admin-card { background: #1a1a1a; border: 1px solid #333; padding: 15px; border-radius: 8px; text-align: center; border-top: 4px solid var(--primary); }
-        .admin-card h4 { margin: 0; color: #888; font-size: 11px; }
-        .admin-card p { margin: 8px 0 0; font-size: 20px; font-weight: bold; color: var(--success); }
-
-        .item-controls { display: flex; gap: 10px; margin: 20px 0; background: #111; padding: 15px; border-radius: 8px; border: 1px solid #333; align-items: flex-end; }
-        .btn { padding: 12px 20px; background: transparent; color: var(--primary); border: 1px solid var(--primary); cursor: pointer; border-radius: 8px; font-weight: bold; transition: 0.3s; text-transform: uppercase; font-size: 12px; }
-        .btn:hover { background: var(--primary); color: #000; }
-        .btn-save { background: var(--primary); color: #000; width: 100%; font-size: 18px; margin-top: 15px; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { background: #111; color: var(--primary); padding: 12px; font-size: 12px; border-bottom: 2px solid #333; }
-        td { padding: 10px; border-bottom: 1px solid #222; text-align: center; }
-        
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); overflow-y: auto; }
-        .modal-content { background: #fff; color: #000; margin: 2% auto; padding: 40px; width: 90%; max-width: 800px; border-radius: 5px; position: relative; }
-
-        .badge { padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; text-transform: uppercase; }
-        .status-pendente { background: #666; color: #fff; }
-        .status-aguardando { background: var(--info); color: #fff; }
-        .status-finalizado { background: var(--success); color: #fff; }
-
-        /* --- CONFIGURAÇÃO DE IMPRESSÃO COM DETALHES AMARELOS --- */
-        @page {
-            size: auto;
-            margin: 0mm; 
+        #overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10000;
+            transition: opacity 1s ease;
         }
 
-        @media print {
-            html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
-            .no-print { display: none !important; }
-            
-            .modal { 
-                position: absolute !important; display: block !important; 
-                background: #fff !important; width: 100% !important; 
-                left: 0 !important; top: 0 !important; margin: 0 !important; padding: 0 !important; 
-            }
-            
-            .modal-content { 
-                border: 4px solid #fcfcfc !important; /* Borda amarela no PDF */
-                width: 100% !important; 
-                max-width: 100% !important;
-                margin: 0 !important; 
-                padding: 1.5cm !important; 
-                box-shadow: none !important; 
-                box-sizing: border-box !important;
-                background: white !important;
-            }
+        #btnEntrar {
+            padding: 15px 40px; font-family: 'Dancing Script', cursive;
+            font-size: 1.8em; background: #b33939;
+            color: white; border: none; border-radius: 50px;
+            cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
 
-            /* Detalhes Amarelos no Cabeçalho do PDF */
-            #conteudoDetalhes h2 { color: #ffc107 !important; }
-            #conteudoDetalhes b { color: #ffc107 !important; }
-            
-            .container { display: none !important; }
-            * { color: black !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-            
-            table { width: 100% !important; border: 1px solid #ffc107 !important; }
-            th { 
-                background: #ffc107 !important; 
-                color: black !important; 
-                border: 1px solid #ffc107 !important; 
-                -webkit-print-color-adjust: exact !important;
-            }
-            td { border: 1px solid #eee !important; }
+        .hearts { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
+
+        .music-control {
+            position: fixed; bottom: 20px; right: 20px; z-index: 1000;
+            background: var(--cor-polaroid); padding: 10px 20px; border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2); cursor: pointer;
+            display: flex; align-items: center; gap: 8px; border: 2px solid var(--cor-principal);
+        }
+
+        .carta {
+            max-width: 750px; 
+            background: var(--cor-carta);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            margin: 40px auto; 
+            padding: 40px; 
+            border-radius: 30px;
+            box-shadow: 0 20px 45px rgba(0,0,0,0.1); 
+        }
+
+        h1 { font-family: 'Dancing Script', cursive; color: var(--cor-principal); font-size: 3.5em; text-align: center; }
+
+        .img-wrap { 
+            margin: 30px auto; 
+            display: inline-block;
+            background: var(--cor-polaroid);
+            padding: 15px 15px 40px 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 2px;
+            transition: transform 0.4s ease;
+            cursor: zoom-in;
+            text-align: center;
+        }
+        .img-wrap:hover { transform: rotate(0deg) scale(1.02) !important; z-index: 10; }
+        .img-wrap img { max-width: 100%; display: block; border: 1px solid rgba(0,0,0,0.05); }
+
+        .legenda { font-family: 'Dancing Script', cursive; font-size: 1.4em; color: var(--cor-principal); margin-top: 15px; }
+
+        .galeria-dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 25px 0; text-align: center; }
+
+        p { line-height: 1.8; font-size: 1.2em; text-align: justify; margin-bottom: 25px; opacity: 0.9; }
+
+        .distancia-container {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(179, 57, 57, 0.05);
+            border-left: 5px solid var(--cor-principal);
+            border-radius: 10px;
+            text-align: center;
+        }
+        .km-numero { font-size: 2.5em; font-family: 'Dancing Script', cursive; color: var(--cor-principal); display: block; }
+        .distancia-frase { font-style: italic; font-size: 1.1em; margin-top: 10px; display: block; }
+
+        .contador-box {
+            background: rgba(179, 57, 57, 0.03); border: 2px dashed var(--cor-principal);
+            padding: 25px; border-radius: 20px; margin: 40px 0; text-align: center;
+        }
+        #tempo { font-weight: bold; font-size: 1.4em; color: var(--cor-principal); margin-top: 10px; }
+
+        #btnSurpresa {
+            background: var(--cor-principal); color: white; border: none; 
+            padding: 15px 35px; font-family: 'Dancing Script', cursive; 
+            font-size: 1.6em; border-radius: 50px; cursor: pointer; 
+            box-shadow: 0 4px 15px rgba(179, 57, 57, 0.3);
+        }
+
+        .assinatura {
+            text-align: center; font-family: 'Dancing Script', cursive;
+            font-size: 2.8em; color: var(--cor-principal);
+            border-top: 1px solid rgba(179, 57, 57, 0.2); padding-top: 30px; margin-top: 40px;
+        }
+
+        #lightbox {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); display: none; justify-content: center;
+            align-items: center; z-index: 5000; cursor: zoom-out;
+        }
+        #lightbox img { max-width: 90%; max-height: 80%; border: 5px solid white; }
+
+        @media (max-width: 600px) {
+            .carta { padding: 20px; margin: 15px 10px; }
+            .galeria-dupla { grid-template-columns: 1fr; }
+            h1 { font-size: 2.5em; }
         }
     </style>
 </head>
 <body>
 
-<div class="container no-print">
-    <div class="header">
-        <img src="https://i.postimg.cc/k4trSjwW/Gemini-Generated-Image-zi6ckhzi6ckhzi6c.png" class="logo-img">
-        <h1 style="margin:0; color:var(--primary);">ELITE MOTO PEÇAS</h1>
-        <p style="margin:0; color:#fff; font-size: 11px; letter-spacing: 2px;">SISTEMA DE GESTÃO</p>
+    <div id="overlay">
+        <div style="font-size: 50px; margin-bottom: 20px;">💌</div>
+        <button id="btnEntrar" onclick="iniciarExperiencia()">Abrir com amor</button>
     </div>
 
-    <div class="tabs">
-        <button class="tab-btn active" onclick="mudarAba('cadastro')">Serviços</button>
-        <button class="tab-btn" onclick="mudarAba('admin')">Faturamento</button>
-        <button class="tab-btn" onclick="mudarAba('historico_aba')">Histórico</button>
+    <div class="hearts" id="heartContainer"></div>
+
+    <iframe id="youtube-player" style="display:none" 
+            src="https://www.youtube.com/embed/WmEHXzcYMcc?enablejsapi=1" 
+            allow="autoplay"></iframe>
+
+    <div class="music-control" onclick="toggleMusic()">
+        <span id="music-icon">⏸️</span>
+        <small id="music-text">Delacruz - Andressa</small>
     </div>
 
-    <div id="aba-cadastro">
-        <div class="info">
-            <div><label>Cliente</label><input id="cliente" placeholder="Nome"></div>
-            <div><label>WhatsApp</label><input id="telefone" placeholder="(00) 00000-0000"></div>
-            <div><label>Moto</label><input id="moto" placeholder="Modelo"></div>
-            <div><label>Ano</label><select id="anoMoto"></select></div>
-            <div><label>Placa</label><input id="placa" placeholder="Placa"></div>
-            <div><label>KM Atual</label><input id="km" type="number"></div>
-            <div><label>Próx. KM</label><input id="prox_km" type="number"></div>
-            <div><label>Data</label><input type="date" id="data"></div>
-            <div>
-                <label>Status do Serviço</label>
-                <select id="statusServico">
-                    <option value="pendente">PENDENTE</option>
-                    <option value="aguardando">AGUARDANDO PEÇA</option>
-                    <option value="finalizado" selected>FINALIZADO</option>
-                </select>
+    <div class="carta">
+        <div class="reveal" style="text-align: center;">
+            <div class="img-wrap" style="transform: rotate(-2deg);" onclick="openLightbox(this)">
+                <img src="https://i.ibb.co/7JcxnCP7/Whats-App-Image-2026-02-16-at-19-53-06-2.jpg">
+                <div class="legenda">Onde meu olhar encontrou o seu... ❤️</div>
             </div>
         </div>
 
-        <div class="item-controls">
-            <input id="inputNovoItem" placeholder="Peça ou serviço...">
-            <button class="btn" onclick="adicionarItem()">+ ADD</button>
+        <h1 id="titulo-digitado"></h1>
+
+        <p class="reveal">Sabe, às vezes eu me pego aqui no silêncio do quarto, com a luz meio baixa e o pensamento longe... e não adianta, ele sempre termina em você. É como se meu coração tivesse um GPS que só sabe marcar o caminho de volta pro teu abraço. Eu fico aqui, olhando pro teto ou pra janela aberta, e percebo que o mundo lá fora pode estar fazendo o barulho que for, mas nada disso importa se eu não tiver a paz que só o seu sorriso me traz.</p>
+
+        <div class="distancia-container reveal">
+            <span class="km-numero">2.459 km</span>
+            <span class="distancia-frase">
+                "A distância é apenas um detalhe para quem tem o destino traçado."
+            </span>
         </div>
 
-        <table>
-            <thead>
-                <tr><th style="text-align:left">Descrição</th><th>OK</th><th>Troca</th><th>Preço</th><th>X</th></tr>
-            </thead>
-            <tbody id="corpoTabela"></tbody>
-        </table>
+        <p class="reveal">Eu já tentei de tudo pra me distrair. Já vi todos os filmes, comecei séries novas, li páginas e páginas de livros... mas parece que tudo o que eu consumo me faz lembrar de algum detalhe nosso. É uma conexão que não envelhece, não cansa e não diminui. Pelo contrário, parece que quanto mais o tempo passa, mais eu entendo que você não é só uma escolha, você é a minha melhor decisão todos os dias.</p>
 
-        <div class="live-total-bar">
-            <div>VALOR DO SERVIÇO ATUAL:</div>
-            <span id="somaServicoAgora">R$ 0,00</span>
-        </div>
-
-        <label>Observações</label>
-        <textarea id="obs" rows="2"></textarea>
-        <button class="btn btn-save" id="btnSalvar">SALVAR NO HISTÓRICO</button>
-        <button class="btn" onclick="limparFormularioCompleto()" style="width: 100%; margin-top: 10px; border-color: var(--danger); color: var(--danger);">LIMPAR TUDO</button>
-    </div>
-
-    <div id="aba-admin" style="display:none;">
-        <h2 style="color: var(--primary);">Resumo Financeiro (Finalizados)</h2>
-        <div class="admin-grid">
-            <div class="admin-card">
-                <h4>HOJE</h4>
-                <p id="fat-hoje">R$ 0,00</p>
+        <div class="galeria-dupla reveal">
+            <div class="img-wrap" style="transform: rotate(3deg);" onclick="openLightbox(this)">
+                <img src="https://i.ibb.co/W49Y80LN/Whats-App-Image-2026-02-16-at-19-53-06.jpg">
+                <div class="legenda">Minha felicidade...</div>
             </div>
-            <div class="admin-card">
-                <h4>ESTE MÊS</h4>
-                <p id="fat-mes">R$ 0,00</p>
-            </div>
-            <div class="admin-card">
-                <h4>TOTAL ACUMULADO</h4>
-                <p id="fat-total">R$ 0,00</p>
-            </div>
-            <div class="admin-card" style="border-top-color: var(--info)">
-                <h4>PENDENTES / ORÇAMENTOS</h4>
-                <p id="fat-pendente" style="color: var(--info)">R$ 0,00</p>
+            <div class="img-wrap" style="transform: rotate(-3deg);" onclick="openLightbox(this)">
+                <img src="https://i.ibb.co/8gSCzZxx/Whats-App-Image-2026-02-16-at-19-53-06-1.jpg">
+                <div class="legenda">...é você.</div>
             </div>
         </div>
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="btn" onclick="exportarBackup()">💾 Backup</button>
-            <button class="btn" onclick="document.getElementById('fileInput').click()">📂 Importar</button>
-            <input type="file" id="fileInput" style="display:none" onchange="importarBackup(event)">
+
+        <p class="reveal">Tem gente que busca o sentido da vida em coisas gigantes, em viagens ou em grandes conquistas. Eu encontrei o meu nas conversas bobas de madrugada, no jeito que você me olha e na segurança de saber que eu tenho você. É uma febre que não passa, um querer que só aumenta e uma certeza que transborda.</p>
+
+        <div class="contador-box reveal">
+            <div style="font-family: 'Dancing Script'; font-size: 1.8em; color: var(--cor-principal);">Nosso tempo de felicidade:</div>
+            <div id="tempo">Calculando...</div>
         </div>
-    </div>
 
-    <div id="aba-historico_aba" style="display:none;">
-        <h2 style="color: var(--primary);">Histórico de Serviços</h2>
-        <input type="text" id="buscaCliente" placeholder="🔍 Buscar por nome, placa ou status..." onkeyup="renderizarHistorico()" style="width: 100%; margin-bottom: 15px;">
-        <div id="listaHistorico"></div>
-    </div>
-</div>
-
-<div id="modalDetalhes" class="modal">
-    <div class="modal-content">
-        <span onclick="fecharModal()" style="float:right; cursor:pointer; font-size:30px;" class="no-print">&times;</span>
-        <div id="conteudoDetalhes"></div>
-        <div style="text-align: center; margin-top: 20px;" class="no-print">
-            <button class="btn" id="btnWpShare" style="background:#25d366; color:white; border:none;">📱 WHATSAPP</button>
-            <button class="btn" onclick="window.print()" style="background:#000; color:#fff;">🖨️ IMPRIMIR</button>
+        <div class="reveal" style="text-align: center;">
+            <div class="img-wrap" style="transform: rotate(-1deg);" onclick="openLightbox(this)">
+                <img src="https://i.ibb.co/pjczZSHF/Whats-App-Image-2026-02-16-at-19-53-05.jpg">
+                <div class="legenda">Nosso destino está escrito.</div>
+            </div>
         </div>
+
+        <div style="text-align: center; margin: 50px 0;" class="reveal">
+            <button id="btnSurpresa" onclick="revelarSurpresa()">
+                Um último segredo...
+            </button>
+            <div id="textoFinal" style="display: none; margin-top: 30px;">
+                <p style="font-style: italic; color: var(--cor-principal); font-size: 1.4em; text-align: center; font-weight: bold; background: var(--cor-polaroid); padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
+                    "Para você, meu amor, eu entrego o meu melhor. Porque no fim das contas, a gente entende que a vida é feita de momentos, e os meus melhores momentos são todos ao seu lado. O mundo pode ser enorme e cheio de gente, mas pra mim, o resto? O resto tanto faz. O que é essencial, o que é real e o que me faz feliz, eu já tenho. Eu amo você, hoje e sempre eu te escolhi e te escolheria mil vezes, todos os dias, em todas as vidas. Você é a minha certeza mais bonita, e eu sou eternamente grato por ter o privilégio de te
+amar... ❤️🔒"
+                </p>
+            </div>
+        </div>
+
+        <div class="assinatura reveal">Eu amo você, hoje e sempre. ❤️🔒</div>
     </div>
-</div>
 
-<script>
-    let itensDaRevisao = [];
-    let historico = JSON.parse(localStorage.getItem("elite_v13_data") || "[]");
-    let editandoId = null;
+    <div id="lightbox" onclick="this.style.display='none'">
+        <img id="lightbox-img">
+    </div>
 
-    function mudarAba(aba) {
-        document.getElementById('aba-cadastro').style.display = 'none';
-        document.getElementById('aba-admin').style.display = 'none';
-        document.getElementById('aba-historico_aba').style.display = 'none';
-        document.getElementById('aba-' + aba).style.display = 'block';
-        
-        document.querySelectorAll('.tab-btn').forEach(b => {
-            b.classList.remove('active');
-            if(b.innerText.toLowerCase().includes(aba === 'historico_aba' ? 'histórico' : aba === 'cadastro' ? 'serviços' : 'faturamento')) {
-                b.classList.add('active');
+    <script>
+        const dataInic = new Date(2025, 5, 17);
+        let playing = false;
+
+        function aplicarTema() {
+            const hora = new Date().getHours();
+            if (hora >= 18 || hora <= 6) {
+                document.body.setAttribute('data-theme', 'dark');
             }
-        });
-
-        if(aba === 'admin') atualizarPainelAdmin();
-    }
-
-    function popularAnos() {
-        const select = document.getElementById("anoMoto");
-        const anoAtual = new Date().getFullYear();
-        select.innerHTML = `<option value="">-</option>`;
-        for(let i = anoAtual + 1; i >= 1990; i--) select.innerHTML += `<option value="${i}">${i}</option>`;
-    }
-
-    function salvarEstadoCampos() {
-        itensDaRevisao.forEach((item, index) => {
-            const ok = document.querySelector(`.chk-ok[data-idx="${index}"]`);
-            const troca = document.querySelector(`.chk-troca[data-idx="${index}"]`);
-            const preco = document.querySelector(`.val-item[data-idx="${index}"]`);
-            if(ok) item.ok = ok.checked;
-            if(troca) item.troca = troca.checked;
-            if(preco) item.preco = preco.value;
-        });
-    }
-
-    function renderizarTabela() {
-        const corpo = document.getElementById("corpoTabela");
-        corpo.innerHTML = itensDaRevisao.map((item, index) => `
-            <tr>
-                <td style="text-align:left">${item.nome}</td>
-                <td><input type="checkbox" class="chk-ok" data-idx="${index}" ${item.ok ? 'checked' : ''} onchange="salvarEstadoCampos()"></td>
-                <td><input type="checkbox" class="chk-troca" data-idx="${index}" ${item.troca ? 'checked' : ''} onchange="salvarEstadoCampos()"></td>
-                <td><input type="text" class="val-item" data-idx="${index}" value="${item.preco}" oninput="aplicarMascaraESoma(this, ${index})"></td>
-                <td><button onclick="removerItem(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer;">X</button></td>
-            </tr>
-        `).join('');
-        calcularSomaAtual();
-    }
-
-    function aplicarMascaraESoma(input, index) {
-        let v = input.value.replace(/\D/g,'');
-        v = (v/100).toFixed(2).replace(".", ",");
-        input.value = v;
-        itensDaRevisao[index].preco = v;
-        calcularSomaAtual();
-    }
-
-    function calcularSomaAtual() {
-        let total = 0;
-        itensDaRevisao.forEach(item => total += parseFloat(item.preco.replace(',', '.')) || 0);
-        document.getElementById("somaServicoAgora").innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-    }
-
-    function adicionarItem() {
-        const input = document.getElementById("inputNovoItem");
-        if(input.value.trim()) {
-            salvarEstadoCampos();
-            itensDaRevisao.push({ nome: input.value.trim(), ok: false, troca: false, preco: "0,00" });
-            input.value = "";
-            renderizarTabela();
         }
-    }
+        aplicarTema();
 
-    function removerItem(i) { itensDaRevisao.splice(i, 1); renderizarTabela(); }
+        window.onblur = () => document.title = "Volta aqui, amor! ❤️";
+        window.onfocus = () => document.title = "Para Você, Meu Amor";
 
-    function atualizarPainelAdmin() {
-        const hoje = new Date().toISOString().split('T')[0];
-        const mesAtual = hoje.substring(0, 7);
+        function iniciarExperiencia() {
+            document.getElementById('overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                toggleMusic();
+                digitarTitulo();
+                ScrollReveal().reveal('.reveal', { delay: 300, distance: '50px', origin: 'bottom', duration: 1000, interval: 200 });
+            }, 1000);
+        }
 
-        let totalHoje = 0, totalMes = 0, totalGeral = 0, totalPendente = 0;
+        function digitarTitulo() {
+            const texto = "Para você, meu amor...";
+            let i = 0;
+            const h1 = document.getElementById('titulo-digitado');
+            function type() {
+                if (i < texto.length) { h1.innerHTML += texto.charAt(i); i++; setTimeout(type, 150); }
+            }
+            type();
+        }
 
-        historico.forEach(r => {
-            if(r.status === 'finalizado') {
-                totalGeral += r.total;
-                if(r.data === hoje) totalHoje += r.total;
-                if(r.data.startsWith(mesAtual)) totalMes += r.total;
+        function atualizarContador() {
+            const agora = new Date();
+            const diff = agora - dataInic;
+            const d = Math.floor(diff / 86400000);
+            const h = Math.floor((diff / 3600000) % 24);
+            const m = Math.floor((diff / 60000) % 60);
+            const s = Math.floor((diff / 1000) % 60);
+            document.getElementById('tempo').innerHTML = `${d} dias, ${h}h, ${m}m e ${s}s`;
+        }
+        setInterval(atualizarContador, 1000);
+
+        function toggleMusic() {
+            const player = document.getElementById('youtube-player').contentWindow;
+            const icon = document.getElementById('music-icon');
+            if(!playing) {
+                player.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
+                icon.innerText = "⏸️";
             } else {
-                totalPendente += r.total;
+                player.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+                icon.innerText = "🎵";
             }
-        });
-
-        document.getElementById("fat-hoje").innerText = `R$ ${totalHoje.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        document.getElementById("fat-mes").innerText = `R$ ${totalMes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        document.getElementById("fat-total").innerText = `R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        document.getElementById("fat-pendente").innerText = `R$ ${totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-    }
-
-    function editarServico(id) {
-        const r = historico.find(h => h.id === id);
-        if (!r) return;
-        editandoId = id; 
-        document.getElementById("cliente").value = r.cliente;
-        document.getElementById("telefone").value = r.telefone;
-        const partes = r.moto.split(' ');
-        const ano = partes.pop();
-        document.getElementById("moto").value = partes.join(' ');
-        document.getElementById("anoMoto").value = ano;
-        document.getElementById("placa").value = r.placa;
-        document.getElementById("km").value = r.km;
-        document.getElementById("prox_km").value = r.prox_km;
-        document.getElementById("data").value = r.data;
-        document.getElementById("obs").value = r.obs;
-        document.getElementById("statusServico").value = r.status || 'finalizado';
-        itensDaRevisao = JSON.parse(JSON.stringify(r.itens));
-        renderizarTabela();
-        mudarAba('cadastro');
-        document.getElementById("btnSalvar").innerText = "ATUALIZAR REGISTRO";
-        document.getElementById("btnSalvar").style.background = "#00c851"; 
-        window.scrollTo(0,0);
-    }
-
-    document.getElementById("btnSalvar").onclick = () => {
-        const cliente = document.getElementById("cliente").value;
-        if(!cliente) return alert("Nome necessário!");
-        salvarEstadoCampos();
-        let totalServico = 0;
-        itensDaRevisao.forEach(i => totalServico += parseFloat(i.preco.replace(',', '.')) || 0);
-
-        const dadosServico = {
-            id: editandoId || Date.now(),
-            cliente,
-            telefone: document.getElementById("telefone").value,
-            moto: `${document.getElementById("moto").value} ${document.getElementById("anoMoto").value}`,
-            placa: document.getElementById("placa").value,
-            km: document.getElementById("km").value,
-            prox_km: document.getElementById("prox_km").value,
-            data: document.getElementById("data").value,
-            status: document.getElementById("statusServico").value,
-            obs: document.getElementById("obs").value,
-            itens: JSON.parse(JSON.stringify(itensDaRevisao)),
-            total: totalServico
-        };
-
-        if (editandoId) {
-            const index = historico.findIndex(h => h.id === editandoId);
-            historico[index] = dadosServico;
-        } else {
-            historico.push(dadosServico);
+            playing = !playing;
         }
 
-        localStorage.setItem("elite_v13_data", JSON.stringify(historico));
-        alert("Sucesso!");
-        location.reload();
-    };
+        function openLightbox(el) {
+            const lb = document.getElementById('lightbox');
+            document.getElementById('lightbox-img').src = el.querySelector('img').src;
+            lb.style.display = 'flex';
+        }
 
-    function renderizarHistorico() {
-        const lista = document.getElementById("listaHistorico");
-        const termo = document.getElementById("buscaCliente").value.toLowerCase();
-        
-        const filtrado = historico.filter(h => 
-            h.cliente.toLowerCase().includes(termo) || 
-            h.placa.toLowerCase().includes(termo) ||
-            (h.status && h.status.toLowerCase().includes(termo))
-        );
+        function revelarSurpresa() {
+            document.getElementById('btnSurpresa').style.display = 'none';
+            document.getElementById('textoFinal').style.display = 'block';
+            var end = Date.now() + (4 * 1000);
+            (function frame() {
+              confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#b33939', '#ffb6c1'] });
+              confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#b33939', '#ffb6c1'] });
+              if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+        }
 
-        lista.innerHTML = filtrado.slice().reverse().map(r => `
-            <div class="historico-item" style="background: #111; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid ${r.status === 'finalizado' ? 'var(--success)' : r.status === 'aguardando' ? 'var(--info)' : '#666'}; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <span style="cursor: pointer; color: var(--primary); font-size: 16px; font-weight: bold; text-decoration: underline;" onclick="verDetalhes(${r.id})">${r.cliente.toUpperCase()}</span> 
-                    <span class="badge status-${r.status || 'finalizado'}">${r.status || 'finalizado'}</span><br>
-                    <small>${r.moto} | ${r.placa} | R$ ${r.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</small>
-                </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn" style="border-color:var(--primary); color:var(--primary); padding: 8px 12px;" onclick="editarServico(${r.id})">EDITAR</button>
-                    <button class="btn" style="border-color:var(--danger); color:var(--danger); padding: 8px 12px;" onclick="excluir(${r.id})">Excluir</button>
-                </div>
-            </div>`).join('');
-    }
-
-    function verDetalhes(id) {
-        const r = historico.find(h => h.id === id);
-        const corpo = document.getElementById("conteudoDetalhes");
-        
-        document.getElementById("btnWpShare").onclick = () => {
-            let msg = `*ELITE MOTO PEÇAS*\nOlá ${r.cliente}, seu serviço está ${r.status.toUpperCase()}!\n\n🏍️ *Moto:* ${r.moto}\n💰 *Total:* R$ ${r.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}\n📍 Prox. Revisão: ${r.prox_km} KM`;
-            window.open(`https://api.whatsapp.com/send?phone=55${r.telefone.replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`, '_blank');
-        };
-
-        corpo.innerHTML = `
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #ffc107; padding-bottom:10px; margin-bottom:20px;">
-                <img src="https://i.postimg.cc/k4trSjwW/Gemini-Generated-Image-zi6ckhzi6ckhzi6c.png" style="max-width:120px;">
-                <div style="text-align:right">
-                    <h2 style="margin:0; color: #ffc107;">ELITE MOTO PEÇAS</h2>
-                    <p style="margin:0">📍 R. Firmino Tavares, 515</p>
-                    <p style="margin:0">📞 (88)99712-6076</p>
-                    <p style="margin:5px 0 0 0;"><b style="color:red">STATUS: ${r.status.toUpperCase()}</b></p>
-                </div>
-            </div>
-            
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px; font-size:13px; background:#fff9e6; padding:10px; border: 1px solid #ffc107;">
-                <span><b style="color:#ffc107">CLIENTE:</b> ${r.cliente.toUpperCase()}</span>
-                <span><b style="color:#ffc107">WHATSAPP:</b> ${r.telefone || '-'}</span>
-                <span><b style="color:#ffc107">MOTO:</b> ${r.moto}</span>
-                <span><b style="color:#ffc107">PLACA:</b> ${r.placa.toUpperCase() || '-'}</span>
-                <span><b style="color:#ffc107">KM ATUAL:</b> ${r.km || '-'}</span>
-                <span><b style="color:#ffc107">PRÓX. REVISÃO:</b> ${r.prox_km || '-'}</span>
-                <span><b style="color:#ffc107">DATA:</b> ${r.data.split('-').reverse().join('/')}</span>
-            </div>
-
-            <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                <thead>
-                    <tr style="background:#ffc107">
-                        <th style="border:1px solid #ffc107; padding:8px; text-align:left; color: black;">DESCRIÇÃO</th>
-                        <th style="border:1px solid #ffc107; padding:8px; color: black;">STATUS</th>
-                        <th style="border:1px solid #ffc107; padding:8px; text-align:right; color: black;">PREÇO</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${r.itens.map(i => `
-                        <tr>
-                            <td style="border:1px solid #eee; padding:8px;">${i.nome}</td>
-                            <td style="border:1px solid #eee; padding:8px; text-align:center;">${i.troca ? 'TROCA' : 'OK'}</td>
-                            <td style="border:1px solid #eee; padding:8px; text-align:right;">R$ ${i.preco}</td>
-                        </tr>
-                    `).join('')}
-                </tbody>
-            </table>
-
-            <div style="margin-top:15px; text-align:right;">
-                <p style="text-align:left; font-size:12px;"><b>OBSERVAÇÕES:</b> ${r.obs || 'Nenhuma.'}</p>
-                <h2 style="margin:5px 0 0 0; color: #ffc107;">TOTAL: R$ ${r.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</h2>
-            </div>
-            <div style="margin-top:30px; text-align:center; font-size:11px;">
-                <p style="color:#ffc107">_________________________________________________</p>
-                <p>ASSINATURA ELITE MOTO PEÇAS</p>
-            </div>
-        `;
-        document.getElementById("modalDetalhes").style.display = "block";
-    }
-
-    function excluir(id) { if(confirm("Excluir definitivamente?")) { historico = historico.filter(h => h.id !== id); localStorage.setItem("elite_v13_data", JSON.stringify(historico)); renderizarHistorico(); } }
-    function fecharModal() { document.getElementById("modalDetalhes").style.display = "none"; }
-    function exportarBackup() { const blob = new Blob([JSON.stringify(historico)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_elite.json`; a.click(); }
-    function importarBackup(e) { const reader = new FileReader(); reader.onload = (ev) => { historico = JSON.parse(ev.target.result); localStorage.setItem("elite_v13_data", JSON.stringify(historico)); renderizarHistorico(); }; reader.readAsText(e.target.files[0]); }
-    function limparFormularioCompleto() { if(confirm("Deseja limpar o formulário atual?")) location.reload(); }
-
-    document.getElementById('data').valueAsDate = new Date();
-    popularAnos();
-    renderizarHistorico();
-</script>
+        function createHeart() {
+            if (document.hidden) return;
+            const h = document.createElement('div');
+            h.innerHTML = '❤️';
+            h.style.position = 'fixed';
+            h.style.left = Math.random() * 100 + 'vw';
+            h.style.top = '-20px';
+            h.style.fontSize = (Math.random() * 20 + 10) + 'px';
+            h.style.opacity = Math.random();
+            h.style.zIndex = '-1';
+            document.body.appendChild(h);
+            const anim = h.animate([{ transform: 'translateY(0) rotate(0deg)', opacity: h.style.opacity }, { transform: `translateY(110vh) rotate(${Math.random() * 360}deg)`, opacity: 0 }], { duration: 6000 + Math.random() * 3000 });
+            anim.onfinish = () => h.remove();
+        }
+        setInterval(createHeart, 600);
+    </script>
 </body>
 </html>
