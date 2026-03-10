@@ -32,7 +32,7 @@
         .tab-btn.active { background: var(--primary); color: #000; }
 
         .info { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; }
+        label { font-size: 11px; color: #888; text-transform: uppercase; font-weight: bold; display: block; margin-bottom: 5px; cursor: pointer; }
         
         input, textarea, select { 
             width: 100%; padding: 12px; border: 1px solid #333; border-radius: 8px; 
@@ -69,40 +69,20 @@
         .status-aguardando { background: var(--info); color: #fff; }
         .status-finalizado { background: var(--success); color: #fff; }
 
-        /* --- CORREÇÃO DE IMPRESSÃO (MATAR CABEÇALHOS DO NAVEGADOR) --- */
-        @page {
-            size: auto;
-            margin: 0mm; /* Remove o espaço da data/hora */
-        }
+        @page { size: auto; margin: 0mm; }
 
         @media print {
             html, body { background: #fff !important; margin: 0 !important; padding: 0 !important; }
             .no-print { display: none !important; }
-            
-            .modal { 
-                position: absolute !important; display: block !important; 
-                background: #fff !important; width: 100% !important; 
-                left: 0 !important; top: 0 !important; margin: 0 !important; padding: 0 !important; 
-            }
-            
-            .modal-content { 
-                border: none !important; 
-                width: 100% !important; 
-                max-width: 100% !important;
-                margin: 0 !important; 
-                padding: 1.5cm !important; /* Margem interna real do papel */
-                box-shadow: none !important; 
-                box-sizing: border-box !important;
-                color: black !important;
-            }
-
+            .modal { position: absolute !important; display: block !important; background: #fff !important; width: 100% !important; left: 0 !important; top: 0 !important; margin: 0 !important; padding: 0 !important; }
+            .modal-content { border: none !important; width: 100% !important; max-width: 100% !important; margin: 0 !important; padding: 1.5cm !important; box-shadow: none !important; box-sizing: border-box !important; color: black !important; }
             .container { display: none !important; }
             * { color: black !important; text-shadow: none !important; }
             table { width: 100% !important; border: 1px solid #000 !important; }
             th { background: #f0f0f0 !important; border: 1px solid #000 !important; color: black !important; }
             td { border: 1px solid #ccc !important; }
         }
-    </style>
+    </style>  
 </head>
 <body>
 
@@ -121,16 +101,16 @@
 
     <div id="aba-cadastro">
         <div class="info">
-            <div><label>Cliente</label><input id="cliente" placeholder="Nome"></div>
-            <div><label>WhatsApp</label><input id="telefone" placeholder="(00) 00000-0000"></div>
-            <div><label>Moto</label><input id="moto" placeholder="Modelo"></div>
-            <div><label>Ano</label><select id="anoMoto"></select></div>
-            <div><label>Placa</label><input id="placa" placeholder="Placa"></div>
-            <div><label>KM Atual</label><input id="km" type="number"></div>
-            <div><label>Próx. KM</label><input id="prox_km" type="number"></div>
-            <div><label>Data</label><input type="date" id="data"></div>
+            <div><label for="cliente">Cliente *</label><input id="cliente" placeholder="Nome do Cliente"></div>
+            <div><label for="telefone">WhatsApp *</label><input id="telefone" type="tel" placeholder="(00) 00000-0000"></div>
+            <div><label for="moto">Moto</label><input id="moto" placeholder="Ex: Honda Titan"></div>
+            <div><label for="anoMoto">Ano</label><select id="anoMoto"></select></div>
+            <div><label for="placa">Placa *</label><input id="placa" placeholder="ABC-1234" oninput="this.value = this.value.toUpperCase()"></div>
+            <div><label for="km">KM Atual</label><input id="km" type="number"></div>
+            <div><label for="prox_km">Próx. KM</label><input id="prox_km" type="number"></div>
+            <div><label for="data">Data</label><input type="date" id="data"></div>
             <div>
-                <label>Status do Serviço</label>
+                <label for="statusServico">Status do Serviço</label>
                 <select id="statusServico">
                     <option value="pendente">PENDENTE</option>
                     <option value="aguardando">AGUARDANDO PEÇA</option>
@@ -140,7 +120,7 @@
         </div>
 
         <div class="item-controls">
-            <input id="inputNovoItem" placeholder="Peça ou serviço...">
+            <input id="inputNovoItem" placeholder="Digite a peça ou serviço..." onkeypress="if(event.key === 'Enter') adicionarItem()">
             <button class="btn" onclick="adicionarItem()">+ ADD</button>
         </div>
 
@@ -156,10 +136,11 @@
             <span id="somaServicoAgora">R$ 0,00</span>
         </div>
 
-        <label>Observações</label>
-        <textarea id="obs" rows="2"></textarea>
+        <label for="obs">Observações</label>
+        <textarea id="obs" rows="2" placeholder="Notas adicionais sobre o serviço..."></textarea>
+        
         <button class="btn btn-save" id="btnSalvar">SALVAR NO HISTÓRICO</button>
-        <button class="btn" onclick="limparFormularioCompleto()" style="width: 100%; margin-top: 10px; border-color: var(--danger); color: var(--danger);">LIMPAR TUDO</button>
+        <button class="btn" onclick="limparFormularioCompleto()" style="width: 100%; margin-top: 10px; border-color: var(--danger); color: var(--danger);">LIMPAR FORMULÁRIO</button>
     </div>
 
     <div id="aba-admin" style="display:none;">
@@ -183,8 +164,8 @@
             </div>
         </div>
         <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-            <button class="btn" onclick="exportarBackup()">💾 Backup</button>
-            <button class="btn" onclick="document.getElementById('fileInput').click()">📂 Importar</button>
+            <button class="btn" onclick="exportarBackup()">💾 Fazer Backup</button>
+            <button class="btn" onclick="document.getElementById('fileInput').click()">📂 Importar Backup</button>
             <input type="file" id="fileInput" style="display:none" onchange="importarBackup(event)">
         </div>
     </div>
@@ -201,17 +182,35 @@
         <span onclick="fecharModal()" style="float:right; cursor:pointer; font-size:30px;" class="no-print">&times;</span>
         <div id="conteudoDetalhes"></div>
         <div style="text-align: center; margin-top: 20px;" class="no-print">
-            <button class="btn" id="btnWpShare" style="background:#25d366; color:white; border:none;">📱 WHATSAPP</button>
-            <button class="btn" onclick="window.print()" style="background:#000; color:#fff;">🖨️ IMPRIMIR</button>
+            <button class="btn" id="btnWpShare" style="background:#25d366; color:white; border:none;">📱 COMPARTILHAR WHATSAPP</button>
+            <button class="btn" onclick="window.print()" style="background:#000; color:#fff;">🖨️ IMPRIMIR RECIBO</button>
         </div>
     </div>
 </div>
 
 <script>
+    // ESTADO DO APLICATIVO
     let itensDaRevisao = [];
     let historico = JSON.parse(localStorage.getItem("elite_v13_data") || "[]");
     let editandoId = null;
 
+    // UTILITÁRIOS
+    function escapeHTML(str) {
+        if (!str) return '';
+        return str.toString().replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag]));
+    }
+
+    function formatarDinheiro(valor) {
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor || 0);
+    }
+
+    function converterStringParaNumero(str) {
+        if (typeof str === 'number') return str;
+        let limpo = str.replace(/\D/g, '');
+        return parseFloat(limpo) / 100 || 0;
+    }
+
+    // NAVEGAÇÃO
     function mudarAba(aba) {
         document.getElementById('aba-cadastro').style.display = 'none';
         document.getElementById('aba-admin').style.display = 'none';
@@ -235,57 +234,65 @@
         for(let i = anoAtual + 1; i >= 1990; i--) select.innerHTML += `<option value="${i}">${i}</option>`;
     }
 
+    // GESTÃO DOS ITENS DA REVISÃO
     function salvarEstadoCampos() {
         itensDaRevisao.forEach((item, index) => {
             const ok = document.querySelector(`.chk-ok[data-idx="${index}"]`);
             const troca = document.querySelector(`.chk-troca[data-idx="${index}"]`);
-            const preco = document.querySelector(`.val-item[data-idx="${index}"]`);
             if(ok) item.ok = ok.checked;
             if(troca) item.troca = troca.checked;
-            if(preco) item.preco = preco.value;
+            // Preço é atualizado via aplicarMascaraESoma durante a digitação
         });
     }
 
     function renderizarTabela() {
         const corpo = document.getElementById("corpoTabela");
-        corpo.innerHTML = itensDaRevisao.map((item, index) => `
+        corpo.innerHTML = itensDaRevisao.map((item, index) => {
+            // Garante exibição formatada ao renderizar
+            let precoFormatado = item.preco.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            return `
             <tr>
-                <td style="text-align:left">${item.nome}</td>
+                <td style="text-align:left">${escapeHTML(item.nome)}</td>
                 <td><input type="checkbox" class="chk-ok" data-idx="${index}" ${item.ok ? 'checked' : ''} onchange="salvarEstadoCampos()"></td>
                 <td><input type="checkbox" class="chk-troca" data-idx="${index}" ${item.troca ? 'checked' : ''} onchange="salvarEstadoCampos()"></td>
-                <td><input type="text" class="val-item" data-idx="${index}" value="${item.preco}" oninput="aplicarMascaraESoma(this, ${index})"></td>
-                <td><button onclick="removerItem(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer;">X</button></td>
+                <td><input type="text" class="val-item" data-idx="${index}" value="${precoFormatado}" oninput="aplicarMascaraESoma(this, ${index})"></td>
+                <td><button onclick="removerItem(${index})" style="background:none; border:none; color:var(--danger); cursor:pointer;" title="Remover item">X</button></td>
             </tr>
-        `).join('');
+        `}).join('');
         calcularSomaAtual();
     }
 
     function aplicarMascaraESoma(input, index) {
-        let v = input.value.replace(/\D/g,'');
-        v = (v/100).toFixed(2).replace(".", ",");
-        input.value = v;
-        itensDaRevisao[index].preco = v;
+        let valorNum = converterStringParaNumero(input.value);
+        itensDaRevisao[index].preco = valorNum; // Salva como número real
+        input.value = valorNum.toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
         calcularSomaAtual();
     }
 
     function calcularSomaAtual() {
-        let total = 0;
-        itensDaRevisao.forEach(item => total += parseFloat(item.preco.replace(',', '.')) || 0);
-        document.getElementById("somaServicoAgora").innerText = `R$ ${total.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        let total = itensDaRevisao.reduce((acc, item) => acc + (parseFloat(item.preco) || 0), 0);
+        document.getElementById("somaServicoAgora").innerText = formatarDinheiro(total);
+        return total;
     }
 
     function adicionarItem() {
         const input = document.getElementById("inputNovoItem");
         if(input.value.trim()) {
             salvarEstadoCampos();
-            itensDaRevisao.push({ nome: input.value.trim(), ok: false, troca: false, preco: "0,00" });
+            itensDaRevisao.push({ nome: input.value.trim(), ok: false, troca: false, preco: 0 });
             input.value = "";
             renderizarTabela();
+            input.focus(); // Mantém o cursor para digitar rápido
         }
     }
 
-    function removerItem(i) { itensDaRevisao.splice(i, 1); renderizarTabela(); }
+    function removerItem(i) { 
+        itensDaRevisao.splice(i, 1); 
+        renderizarTabela(); 
+    }
 
+    // GESTÃO GERAL E ADMIN
     function atualizarPainelAdmin() {
         const hoje = new Date().toISOString().split('T')[0];
         const mesAtual = hoje.substring(0, 7);
@@ -293,64 +300,48 @@
         let totalHoje = 0, totalMes = 0, totalGeral = 0, totalPendente = 0;
 
         historico.forEach(r => {
+            let valor = parseFloat(r.total) || 0;
             if(r.status === 'finalizado') {
-                totalGeral += r.total;
-                if(r.data === hoje) totalHoje += r.total;
-                if(r.data.startsWith(mesAtual)) totalMes += r.total;
+                totalGeral += valor;
+                if(r.data === hoje) totalHoje += valor;
+                if(r.data.startsWith(mesAtual)) totalMes += valor;
             } else {
-                totalPendente += r.total;
+                totalPendente += valor;
             }
         });
 
-        document.getElementById("fat-hoje").innerText = `R$ ${totalHoje.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        document.getElementById("fat-mes").innerText = `R$ ${totalMes.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        document.getElementById("fat-total").innerText = `R$ ${totalGeral.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
-        document.getElementById("fat-pendente").innerText = `R$ ${totalPendente.toLocaleString('pt-BR', {minimumFractionDigits: 2})}`;
+        document.getElementById("fat-hoje").innerText = formatarDinheiro(totalHoje);
+        document.getElementById("fat-mes").innerText = formatarDinheiro(totalMes);
+        document.getElementById("fat-total").innerText = formatarDinheiro(totalGeral);
+        document.getElementById("fat-pendente").innerText = formatarDinheiro(totalPendente);
     }
 
-    function editarServico(id) {
-        const r = historico.find(h => h.id === id);
-        if (!r) return;
-        editandoId = id; 
-        document.getElementById("cliente").value = r.cliente;
-        document.getElementById("telefone").value = r.telefone;
-        const partes = r.moto.split(' ');
-        const ano = partes.pop();
-        document.getElementById("moto").value = partes.join(' ');
-        document.getElementById("anoMoto").value = ano;
-        document.getElementById("placa").value = r.placa;
-        document.getElementById("km").value = r.km;
-        document.getElementById("prox_km").value = r.prox_km;
-        document.getElementById("data").value = r.data;
-        document.getElementById("obs").value = r.obs;
-        document.getElementById("statusServico").value = r.status || 'finalizado';
-        itensDaRevisao = JSON.parse(JSON.stringify(r.itens));
-        renderizarTabela();
-        mudarAba('cadastro');
-        document.getElementById("btnSalvar").innerText = "ATUALIZAR REGISTRO";
-        document.getElementById("btnSalvar").style.background = "#00c851"; 
-        window.scrollTo(0,0);
-    }
-
+    // SALVAR E EDITAR
     document.getElementById("btnSalvar").onclick = () => {
-        const cliente = document.getElementById("cliente").value;
-        if(!cliente) return alert("Nome necessário!");
+        const cliente = document.getElementById("cliente").value.trim();
+        const telefone = document.getElementById("telefone").value.trim();
+        const placa = document.getElementById("placa").value.trim();
+        
+        // Validação rigorosa
+        if(!cliente || !telefone || !placa) {
+            return alert("Atenção: Nome, WhatsApp e Placa são obrigatórios!");
+        }
+
         salvarEstadoCampos();
-        let totalServico = 0;
-        itensDaRevisao.forEach(i => totalServico += parseFloat(i.preco.replace(',', '.')) || 0);
+        const totalServico = calcularSomaAtual();
 
         const dadosServico = {
             id: editandoId || Date.now(),
             cliente,
-            telefone: document.getElementById("telefone").value,
-            moto: `${document.getElementById("moto").value} ${document.getElementById("anoMoto").value}`,
-            placa: document.getElementById("placa").value,
+            telefone,
+            moto: `${document.getElementById("moto").value} ${document.getElementById("anoMoto").value}`.trim(),
+            placa,
             km: document.getElementById("km").value,
             prox_km: document.getElementById("prox_km").value,
             data: document.getElementById("data").value,
             status: document.getElementById("statusServico").value,
             obs: document.getElementById("obs").value,
-            itens: JSON.parse(JSON.stringify(itensDaRevisao)),
+            itens: JSON.parse(JSON.stringify(itensDaRevisao)), // Clone profundo
             total: totalServico
         };
 
@@ -362,30 +353,83 @@
         }
 
         localStorage.setItem("elite_v13_data", JSON.stringify(historico));
-        alert("Sucesso!");
-        location.reload();
+        alert("Serviço salvo com sucesso!");
+        limparFormularioCompleto(true); // Limpa sem perguntar após salvar
     };
 
+    function editarServico(id) {
+        const r = historico.find(h => h.id === id);
+        if (!r) return;
+        
+        editandoId = id; 
+        document.getElementById("cliente").value = r.cliente || '';
+        document.getElementById("telefone").value = r.telefone || '';
+        
+        const partes = (r.moto || '').split(' ');
+        const ano = partes.pop() || '';
+        document.getElementById("moto").value = partes.join(' ');
+        document.getElementById("anoMoto").value = ano;
+        
+        document.getElementById("placa").value = r.placa || '';
+        document.getElementById("km").value = r.km || '';
+        document.getElementById("prox_km").value = r.prox_km || '';
+        document.getElementById("data").value = r.data || new Date().toISOString().split('T')[0];
+        document.getElementById("obs").value = r.obs || '';
+        document.getElementById("statusServico").value = r.status || 'finalizado';
+        
+        // Converte os preços antigos (que podiam ser string) para número para compatibilidade
+        itensDaRevisao = r.itens.map(i => ({...i, preco: typeof i.preco === 'string' ? parseFloat(i.preco.replace(',', '.')) || 0 : i.preco}));
+        
+        renderizarTabela();
+        mudarAba('cadastro');
+        
+        const btnSalvar = document.getElementById("btnSalvar");
+        btnSalvar.innerText = "ATUALIZAR REGISTRO";
+        btnSalvar.style.background = "var(--success)"; 
+        window.scrollTo(0,0);
+    }
+
+    function limparFormularioCompleto(forcar = false) {
+        if(forcar || confirm("Deseja realmente limpar todos os dados da tela?")) {
+            editandoId = null;
+            itensDaRevisao = [];
+            
+            // Limpa todos os inputs de texto, números, tel, etc.
+            document.querySelectorAll('#aba-cadastro input[type="text"], #aba-cadastro input[type="tel"], #aba-cadastro input[type="number"], #aba-cadastro textarea').forEach(el => el.value = '');
+            
+            document.getElementById("statusServico").value = 'finalizado';
+            document.getElementById("anoMoto").value = '';
+            document.getElementById('data').valueAsDate = new Date();
+            
+            const btnSalvar = document.getElementById("btnSalvar");
+            btnSalvar.innerText = "SALVAR NO HISTÓRICO";
+            btnSalvar.style.background = "var(--primary)";
+            
+            renderizarTabela();
+        }
+    }
+
+    // HISTÓRICO E DETALHES
     function renderizarHistorico() {
         const lista = document.getElementById("listaHistorico");
         const termo = document.getElementById("buscaCliente").value.toLowerCase();
         
         const filtrado = historico.filter(h => 
-            h.cliente.toLowerCase().includes(termo) || 
-            h.placa.toLowerCase().includes(termo) ||
+            (h.cliente || '').toLowerCase().includes(termo) || 
+            (h.placa || '').toLowerCase().includes(termo) ||
             (h.status && h.status.toLowerCase().includes(termo))
         );
 
         lista.innerHTML = filtrado.slice().reverse().map(r => `
             <div class="historico-item" style="background: #111; padding: 15px; margin-bottom: 10px; border-radius: 8px; border-left: 4px solid ${r.status === 'finalizado' ? 'var(--success)' : r.status === 'aguardando' ? 'var(--info)' : '#666'}; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <span style="cursor: pointer; color: var(--primary); font-size: 16px; font-weight: bold; text-decoration: underline;" onclick="verDetalhes(${r.id})">${r.cliente.toUpperCase()}</span> 
-                    <span class="badge status-${r.status || 'finalizado'}">${r.status || 'finalizado'}</span><br>
-                    <small>${r.moto} | ${r.placa} | R$ ${r.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</small>
+                    <span style="cursor: pointer; color: var(--primary); font-size: 16px; font-weight: bold; text-decoration: underline;" onclick="verDetalhes(${r.id})">${escapeHTML(r.cliente).toUpperCase()}</span> 
+                    <span class="badge status-${escapeHTML(r.status || 'finalizado')}">${escapeHTML(r.status || 'finalizado')}</span><br>
+                    <small>${escapeHTML(r.moto)} | ${escapeHTML(r.placa)} | ${formatarDinheiro(r.total)}</small>
                 </div>
                 <div style="display: flex; gap: 8px;">
                     <button class="btn" style="border-color:var(--primary); color:var(--primary); padding: 8px 12px;" onclick="editarServico(${r.id})">EDITAR</button>
-                    <button class="btn" style="border-color:var(--danger); color:var(--danger); padding: 8px 12px;" onclick="excluir(${r.id})">Excluir</button>
+                    <button class="btn" style="border-color:var(--danger); color:var(--danger); padding: 8px 12px;" onclick="excluir(${r.id})">EXCLUIR</button>
                 </div>
             </div>`).join('');
     }
@@ -395,7 +439,8 @@
         const corpo = document.getElementById("conteudoDetalhes");
         
         document.getElementById("btnWpShare").onclick = () => {
-            let msg = `*ELITE MOTO PEÇAS*\nOlá ${r.cliente}, seu serviço está ${r.status.toUpperCase()}!\n\n🏍️ *Moto:* ${r.moto}\n💰 *Total:* R$ ${r.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}\n📍 Prox. Revisão: ${r.prox_km} KM`;
+            let totalFormatado = formatarDinheiro(r.total);
+            let msg = `*ELITE MOTO PEÇAS*\nOlá ${r.cliente}, seu serviço está ${r.status.toUpperCase()}!\n\n🏍️ *Moto:* ${r.moto}\n💰 *Total:* ${totalFormatado}\n📍 Prox. Revisão: ${r.prox_km} KM`;
             window.open(`https://api.whatsapp.com/send?phone=55${r.telefone.replace(/\D/g,'')}&text=${encodeURIComponent(msg)}`, '_blank');
         };
 
@@ -406,17 +451,17 @@
                     <h2 style="margin:0">ELITE MOTO PEÇAS</h2>
                     <p style="margin:0">📍 R. Firmino Tavares, 515</p>
                     <p style="margin:0">📞 (88)99712-6076</p>
-                    <p style="margin:5px 0 0 0;"><b style="color:red">STATUS: ${r.status.toUpperCase()}</b></p>
+                    <p style="margin:5px 0 0 0;"><b style="color:red">STATUS: ${escapeHTML(r.status).toUpperCase()}</b></p>
                 </div>
             </div>
             
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px; font-size:13px; background:#f4f4f4; padding:10px;">
-                <span><b>CLIENTE:</b> ${r.cliente.toUpperCase()}</span>
-                <span><b>WHATSAPP:</b> ${r.telefone || '-'}</span>
-                <span><b>MOTO:</b> ${r.moto}</span>
-                <span><b>PLACA:</b> ${r.placa.toUpperCase() || '-'}</span>
-                <span><b>KM ATUAL:</b> ${r.km || '-'}</span>
-                <span><b>PRÓX. REVISÃO:</b> ${r.prox_km || '-'}</span>
+                <span><b>CLIENTE:</b> ${escapeHTML(r.cliente).toUpperCase()}</span>
+                <span><b>WHATSAPP:</b> ${escapeHTML(r.telefone || '-')}</span>
+                <span><b>MOTO:</b> ${escapeHTML(r.moto)}</span>
+                <span><b>PLACA:</b> ${escapeHTML(r.placa).toUpperCase() || '-'}</span>
+                <span><b>KM ATUAL:</b> ${escapeHTML(r.km || '-')}</span>
+                <span><b>PRÓX. REVISÃO:</b> ${escapeHTML(r.prox_km || '-')}</span>
                 <span><b>DATA:</b> ${r.data.split('-').reverse().join('/')}</span>
             </div>
 
@@ -431,17 +476,17 @@
                 <tbody>
                     ${r.itens.map(i => `
                         <tr>
-                            <td style="border:1px solid #ddd; padding:8px;">${i.nome}</td>
+                            <td style="border:1px solid #ddd; padding:8px;">${escapeHTML(i.nome)}</td>
                             <td style="border:1px solid #ddd; padding:8px; text-align:center;">${i.troca ? 'TROCA' : 'OK'}</td>
-                            <td style="border:1px solid #ddd; padding:8px; text-align:right;">R$ ${i.preco}</td>
+                            <td style="border:1px solid #ddd; padding:8px; text-align:right;">${formatarDinheiro(i.preco)}</td>
                         </tr>
                     `).join('')}
                 </tbody>
             </table>
 
             <div style="margin-top:15px; text-align:right;">
-                <p style="text-align:left; font-size:12px;"><b>OBSERVAÇÕES:</b> ${r.obs || 'Nenhuma.'}</p>
-                <h2 style="margin:5px 0 0 0;">TOTAL: R$ ${r.total.toLocaleString('pt-BR', {minimumFractionDigits:2})}</h2>
+                <p style="text-align:left; font-size:12px;"><b>OBSERVAÇÕES:</b> ${escapeHTML(r.obs || 'Nenhuma.')}</p>
+                <h2 style="margin:5px 0 0 0;">TOTAL: ${formatarDinheiro(r.total)}</h2>
             </div>
             <div style="margin-top:30px; text-align:center; font-size:11px;">
                 <p>_________________________________________________</p>
@@ -451,12 +496,41 @@
         document.getElementById("modalDetalhes").style.display = "block";
     }
 
-    function excluir(id) { if(confirm("Excluir definitivamente?")) { historico = historico.filter(h => h.id !== id); localStorage.setItem("elite_v13_data", JSON.stringify(historico)); renderizarHistorico(); } }
+    function excluir(id) { 
+        if(confirm("Excluir registro definitivamente?")) { 
+            historico = historico.filter(h => h.id !== id); 
+            localStorage.setItem("elite_v13_data", JSON.stringify(historico)); 
+            renderizarHistorico(); 
+        } 
+    }
+    
     function fecharModal() { document.getElementById("modalDetalhes").style.display = "none"; }
-    function exportarBackup() { const blob = new Blob([JSON.stringify(historico)], {type: 'application/json'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `backup_elite.json`; a.click(); }
-    function importarBackup(e) { const reader = new FileReader(); reader.onload = (ev) => { historico = JSON.parse(ev.target.result); localStorage.setItem("elite_v13_data", JSON.stringify(historico)); renderizarHistorico(); }; reader.readAsText(e.target.files[0]); }
-    function limparFormularioCompleto() { if(confirm("Deseja limpar o formulário atual?")) location.reload(); }
+    
+    function exportarBackup() { 
+        const blob = new Blob([JSON.stringify(historico)], {type: 'application/json'}); 
+        const a = document.createElement('a'); 
+        a.href = URL.createObjectURL(blob); 
+        const data = new Date().toISOString().split('T')[0];
+        a.download = `backup_elite_motopecas_${data}.json`; 
+        a.click(); 
+    }
+    
+    function importarBackup(e) { 
+        const reader = new FileReader(); 
+        reader.onload = (ev) => { 
+            try {
+                historico = JSON.parse(ev.target.result); 
+                localStorage.setItem("elite_v13_data", JSON.stringify(historico)); 
+                renderizarHistorico(); 
+                alert("Backup importado com sucesso!");
+            } catch (err) {
+                alert("Erro ao ler o arquivo de backup. Verifique se o formato está correto.");
+            }
+        }; 
+        if(e.target.files[0]) reader.readAsText(e.target.files[0]); 
+    }
 
+    // INICIALIZAÇÃO
     document.getElementById('data').valueAsDate = new Date();
     popularAnos();
     renderizarHistorico();
